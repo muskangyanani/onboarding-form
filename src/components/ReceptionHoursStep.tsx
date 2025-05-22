@@ -61,65 +61,60 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
 
   const handleDayToggle = (day: keyof OperatingHours) => {
     setOperatingHours(prev => {
-      const newState = { ...prev };
+        const newState = { ...prev };
 
-      // Logic for toggling day groups and individual days
-      if (day === 'allDays') {
-        newState.allDays = !prev.allDays;
-        if (newState.allDays) {
-          newState.weekdays = false;
-          newState.weekend = false;
-          newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = true;
-        } else {
-          // If "All Days" is untoggled, clear all individual days
-          newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = false;
-        }
-      } else if (day === 'weekdays') {
-        newState.weekdays = !prev.weekdays;
-        if (newState.weekdays) {
-          newState.allDays = false;
-          newState.weekend = false;
-          newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = true;
-          newState.sat = newState.sun = false;
-        } else {
-            // If "Weekdays" is untoggled, clear weekday individual days
-            newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
-        }
-      } else if (day === 'weekend') {
-        newState.weekend = !prev.weekend;
-        if (newState.weekend) {
-          newState.allDays = false;
-          newState.weekdays = false;
-          newState.sat = newState.sun = true;
-          newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
-        } else {
-            // If "Weekend" is untoggled, clear weekend individual days
-            newState.sat = newState.sun = false;
-        }
-      } else { // Individual day toggled
-        // Only toggle if day is an individual day key
-        const individualDays: Array<keyof Pick<OperatingHours, 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'>> = [
-          'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
-        ];
-        if (individualDays.includes(day as any)) {
-          const d = day as 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
-          newState[d] = !prev[d];
+        // Logic for toggling day groups and individual days
+        if (day === 'allDays') {
+            newState.allDays = !prev.allDays; // Toggle its own state first
+            if (newState.allDays) {
+                // If "Custom" is now true, set all individual days to true
+                newState.weekdays = false; // Deselect other groups
+                newState.weekend = false;
+                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = true;
+            } else {
+                // If "Custom" is now false (untoggled), set all individual days to false
+                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = false;
+            }
+        } else if (day === 'weekdays') {
+            newState.weekdays = !prev.weekdays;
+            if (newState.weekdays) {
+                newState.allDays = false; // Deselect other groups
+                newState.weekend = false;
+                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = true;
+                newState.sat = newState.sun = false;
+            } else {
+                // If "Weekdays" is untoggled, clear weekday individual days
+                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
+            }
+        } else if (day === 'weekend') {
+            newState.weekend = !prev.weekend;
+            if (newState.weekend) {
+                newState.allDays = false; // Deselect other groups
+                newState.weekdays = false;
+                newState.sat = newState.sun = true;
+                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
+            } else {
+                // If "Weekend" is untoggled, clear weekend individual days
+                newState.sat = newState.sun = false;
+            }
+        } else { // Individual day toggled (e.g., 'mon', 'tue', etc.)
+            const dayKey = day as 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+            newState[dayKey] = !prev[dayKey]; // Toggle individual day
 
-          // If an individual day is toggled, deselect 'allDays', 'weekdays', 'weekend'
-          newState.allDays = false;
-          newState.weekdays = false;
-          newState.weekend = false;
+            // If an individual day is toggled, deselect 'allDays', 'weekdays', 'weekend' groups
+            newState.allDays = false;
+            newState.weekdays = false;
+            newState.weekend = false;
 
-          // Optional: If all individual days become true, re-select "All Days"
-          const allIndividualDaysSelected = individualDays.every(dKey => newState[dKey]);
-          if (allIndividualDaysSelected) {
-              newState.allDays = true;
-          }
+            // Optional: If all individual days become true, re-select "Custom"
+            const allIndividualDaysSelected = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].every(d => newState[d as keyof OperatingHours]);
+            if (allIndividualDaysSelected) {
+                newState.allDays = true;
+            }
         }
-      }
-      return newState;
+        return newState;
     });
-  };
+};
 
 
   const handleTimeChange = (type: 'from' | 'to', e: ReactChangeEvent<HTMLInputElement>) => {
@@ -239,7 +234,7 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
           Reception Operating Hours
         </label>
         <div className="flex flex-wrap gap-2 mb-4">
-          {['All Days', 'Weekdays', 'Weekend'].map((dayGroup) => {
+          {['Custom', 'Weekdays', 'Weekend'].map((dayGroup) => {
             const key = dayGroup.replace(' ', '').toLowerCase() as 'allDays' | 'weekdays' | 'weekend';
             return (
               <button
@@ -379,7 +374,7 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
           id="description"
           rows={3}
           className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-y"
-          placeholder="All the L"
+          placeholder="eg., all the liquor and other bar items to order"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         ></textarea>

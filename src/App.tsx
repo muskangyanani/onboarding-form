@@ -88,7 +88,12 @@ function App() {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <ContactInfoStep onNext={handleContactInfoSubmit} />;
+        return (
+          <ContactInfoStep
+            onNext={handleContactInfoSubmit}
+            initialData={{ name: formData.name, phoneNumber: formData.phoneNumber }}
+          />
+        );
       case 2:
         return (
           <HotelDetailsStep

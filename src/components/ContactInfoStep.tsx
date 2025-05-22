@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 
 // Define props for this step, including a way to pass data up and trigger next step
 interface ContactInfoStepProps {
+  initialData?: { 
+    name: string; 
+    phoneNumber: string; 
+  };
   onNext: (data: { name: string; phoneNumber: string }) => void;
 }
 
-const ContactInfoStep: React.FC<ContactInfoStepProps> = ({ onNext }) => {
-  const [name, setName] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+const ContactInfoStep: React.FC<ContactInfoStepProps> = ({ onNext, initialData }) => {
+  const [name, setName] = useState<string>(initialData?.name || ''); 
+  const [phoneNumber, setPhoneNumber] = useState<string>(initialData?.phoneNumber || ''); 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
