@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// Define props for this step, including a way to pass data up and trigger next step
 interface ContactInfoStepProps {
   initialData?: { 
     name: string; 
@@ -14,13 +13,12 @@ const ContactInfoStep: React.FC<ContactInfoStepProps> = ({ onNext, initialData }
   const [phoneNumber, setPhoneNumber] = useState<string>(initialData?.phoneNumber || ''); 
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    // Basic validation
+    e.preventDefault();
     if (name.trim() === '' || phoneNumber.trim() === '') {
       alert('Please fill in both name and phone number.');
       return;
     }
-    onNext({ name, phoneNumber }); // Pass data up to the parent component
+    onNext({ name, phoneNumber }); 
   };
 
   return (
@@ -45,15 +43,13 @@ const ContactInfoStep: React.FC<ContactInfoStepProps> = ({ onNext, initialData }
           You can reach out at
         </label>
         <div className="flex items-center mt-1">
-          {/* Country code input */}
           <select
             className="block pl-3 pr-8 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-900 sm:text-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="+91">IN +91</option>
-            {/* You can add more options here for other countries */}
           </select>
           <input
-            type="tel" // Use type="tel" for phone numbers
+            type="tel"
             id="phoneNumber"
             className="block w-full px-4 py-2 border border-gray-300 rounded-r-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm -ml-px"
             placeholder="Enter phone number"

@@ -140,7 +140,7 @@ function App() {
       case 2:
         return "Hello, I'm AgukenAI.";
       case 3:
-        return "Total Number of Rooms"; // As per image_f597e3.png, the main title changes here
+        return "Total Number of Rooms";
       case 4:
         return "Onboarding Complete!";
       default:
@@ -154,7 +154,7 @@ function App() {
         case 2:
             return "I'm an AI Agent helping you handle reception and support calls using GenAI-based phone call automation.";
         case 3:
-            return "Reception Operating Hours"; // Subtitle also changes slightly to match image
+            return "Reception Operating Hours"; 
         default:
             return "";
     }

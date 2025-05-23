@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
-import type { ChangeEvent as ReactChangeEvent } from 'react'; // Renamed to avoid conflict if ChangeEvent is used elsewhere
+import type { ChangeEvent as ReactChangeEvent } from 'react'; 
 
-// Define the structure for operating hours
 interface OperatingHours {
   allDays: boolean;
   weekdays: boolean;
@@ -17,7 +16,6 @@ interface OperatingHours {
   to: string;
 }
 
-// Define props for this step
 interface ReceptionHoursStepProps {
   initialData?: {
     totalRooms: number;
@@ -39,8 +37,8 @@ const initialOperatingHours: OperatingHours = {
   fri: false,
   sat: false,
   sun: false,
-  from: '09:00', // Use 24-hour format for internal logic, convert for display if needed
-  to: '21:00', // 21:00 is 9:00 PM
+  from: '09:00',
+  to: '21:00', 
 };
 
 const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, onNext, onBack }) => {
@@ -49,12 +47,11 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
     initialData?.receptionOperatingHours || initialOperatingHours
   );
   const [barMenuFiles, setBarMenuFiles] = useState<File[]>([]);
-  const [description, setDescription] = useState<string>(initialData?.description || ''); // Initialize with initialData
+  const [description, setDescription] = useState<string>(initialData?.description || ''); 
 
-  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input click
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleTotalRoomsChange = (e: ReactChangeEvent<HTMLInputElement>) => {
-    // Ensure input is a number and non-negative
     const value = parseInt(e.target.value, 10);
     setTotalRooms(isNaN(value) || value < 0 ? 0 : value);
   };
@@ -62,51 +59,42 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
   const handleDayToggle = (day: keyof OperatingHours) => {
     setOperatingHours(prev => {
         const newState = { ...prev };
-
-        // Logic for toggling day groups and individual days
         if (day === 'allDays') {
-            newState.allDays = !prev.allDays; // Toggle its own state first
+            newState.allDays = !prev.allDays;
             if (newState.allDays) {
-                // If "Custom" is now true, set all individual days to true
-                newState.weekdays = false; // Deselect other groups
-                newState.weekend = false;
-                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = true;
+              newState.weekdays = false; 
+              newState.weekend = false;
+              newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = true;
             } else {
-                // If "Custom" is now false (untoggled), set all individual days to false
-                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = false;
+              newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = newState.sat = newState.sun = false;
             }
         } else if (day === 'weekdays') {
             newState.weekdays = !prev.weekdays;
             if (newState.weekdays) {
-                newState.allDays = false; // Deselect other groups
-                newState.weekend = false;
-                newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = true;
-                newState.sat = newState.sun = false;
+              newState.allDays = false;
+              newState.weekend = false;
+              newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = true;
+              newState.sat = newState.sun = false;
             } else {
-                // If "Weekdays" is untoggled, clear weekday individual days
                 newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
             }
         } else if (day === 'weekend') {
             newState.weekend = !prev.weekend;
             if (newState.weekend) {
-                newState.allDays = false; // Deselect other groups
+                newState.allDays = false; 
                 newState.weekdays = false;
                 newState.sat = newState.sun = true;
                 newState.mon = newState.tue = newState.wed = newState.thu = newState.fri = false;
             } else {
-                // If "Weekend" is untoggled, clear weekend individual days
                 newState.sat = newState.sun = false;
             }
-        } else { // Individual day toggled (e.g., 'mon', 'tue', etc.)
+        } else { 
             const dayKey = day as 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
-            newState[dayKey] = !prev[dayKey]; // Toggle individual day
-
-            // If an individual day is toggled, deselect 'allDays', 'weekdays', 'weekend' groups
+            newState[dayKey] = !prev[dayKey]; 
             newState.allDays = false;
             newState.weekdays = false;
             newState.weekend = false;
 
-            // Optional: If all individual days become true, re-select "Custom"
             const allIndividualDaysSelected = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].every(d => newState[d as keyof OperatingHours]);
             if (allIndividualDaysSelected) {
                 newState.allDays = true;
@@ -116,7 +104,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
     });
 };
 
-
   const handleTimeChange = (type: 'from' | 'to', e: ReactChangeEvent<HTMLInputElement>) => {
     setOperatingHours(prev => ({ ...prev, [type]: e.target.value }));
   };
@@ -124,11 +111,10 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
   const handleFileChange = (e: ReactChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      // Optional: Add file size/type validation here
       const validFiles = filesArray.filter(file => {
         const fileType = file.type;
-        const fileSize = file.size; // in bytes
-        const maxSize = 10 * 1024 * 1024; // 10 MB
+        const fileSize = file.size; 
+        const maxSize = 10 * 1024 * 1024; 
 
         if (!['application/pdf', 'image/jpeg', 'image/png'].includes(fileType)) {
           alert(`File ${file.name} is not a PDF, JPG, or PNG.`);
@@ -142,7 +128,7 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
       });
 
       setBarMenuFiles(prev => [...prev, ...validFiles]);
-      e.target.value = ''; // Clear the input so same file can be selected again
+      e.target.value = '';
     }
   };
 
@@ -151,18 +137,18 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
   };
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // Essential to allow dropping
+    e.preventDefault(); 
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files) {
       const filesArray = Array.from(e.dataTransfer.files);
-      // Directly use the file handling logic
+      
       const validFiles = filesArray.filter(file => {
         const fileType = file.type;
-        const fileSize = file.size; // in bytes
-        const maxSize = 10 * 1024 * 1024; // 10 MB
+        const fileSize = file.size; 
+        const maxSize = 10 * 1024 * 1024; 
 
         if (!['application/pdf', 'image/jpeg', 'image/png'].includes(fileType)) {
           alert(`File ${file.name} is not a PDF, JPG, or PNG.`);
@@ -181,7 +167,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Basic validation for rooms and operating hours
     if (totalRooms <= 0) {
       alert('Please enter a valid number of rooms.');
       return;
@@ -198,10 +183,9 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
         return;
     }
 
-    onNext({ totalRooms, receptionOperatingHours: operatingHours, description: description /*, menuFiles: barMenuFiles */ });
+    onNext({ totalRooms, receptionOperatingHours: operatingHours, description: description  });
   };
 
-  // Corrected formatTimeForDisplay to return a direct string, not JSX elements
   const formatTimeForDisplay = (time: string) => {
     if (!time) return '';
     const [hours, minutes] = time.split(':').map(Number);
@@ -212,7 +196,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Total Number of Rooms */}
       <div>
         <label htmlFor="totalRooms" className="block text-gray-700 text-sm font-medium mb-2">
           Total Number of Rooms
@@ -228,7 +211,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
         />
       </div>
 
-      {/* Reception Operating Hours */}
       <div>
         <label className="block text-gray-700 text-sm font-medium mb-2">
           Reception Operating Hours
@@ -273,10 +255,9 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
           })}
         </div>
 
-        {/* Time Pickers - CORRECTED SECTION */}
-        <div className="flex items-start gap-4"> {/* Changed to items-start for label alignment */}
+        <div className="flex items-start gap-4">
           <div className="flex flex-col">
-            <label htmlFor="fromTime" className="block text-gray-700 text-sm font-medium mb-1">From</label> {/* Label above input */}
+            <label htmlFor="fromTime" className="block text-gray-700 text-sm font-medium mb-1">From</label> 
             <input
               type="time"
               id="fromTime"
@@ -285,16 +266,15 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
               onChange={(e) => handleTimeChange('from', e)}
               required
             />
-            {/* Display AM/PM below the input, using the corrected formatTimeForDisplay */}
             <span className="text-xs text-gray-500 mt-1 self-center">
               {formatTimeForDisplay(operatingHours.from)}
             </span>
           </div>
 
-          <span className="text-gray-700 mt-8">To</span> {/* Adjusted margin-top for better alignment with inputs */}
+          <span className="text-gray-700 mt-8">To</span> 
 
           <div className="flex flex-col">
-            <label htmlFor="toTime" className="block text-gray-700 text-sm font-medium mb-1">To</label> {/* Label above input */}
+            <label htmlFor="toTime" className="block text-gray-700 text-sm font-medium mb-1">To</label> 
             <input
               type="time"
               id="toTime"
@@ -303,7 +283,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
               onChange={(e) => handleTimeChange('to', e)}
               required
             />
-            {/* Display AM/PM below the input */}
             <span className="text-xs text-gray-500 mt-1 self-center">
               {formatTimeForDisplay(operatingHours.to)}
             </span>
@@ -311,13 +290,11 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
         </div>
       </div>
 
-      {/* Upload Menus Section */}
       <div>
         <label className="block text-gray-700 text-sm font-medium mb-2">
           Upload Menus (for food ordering or inquiries)
         </label>
         <div className="space-y-4">
-          {/* Bar Menu */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Bar Menu</p>
             <div
@@ -337,11 +314,11 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
                 id="file-upload"
                 name="file-upload"
                 type="file"
-                multiple // Allow multiple file selection
-                className="sr-only" // Visually hide the input
+                multiple 
+                className="sr-only"
                 onChange={handleFileChange}
                 ref={fileInputRef}
-                accept=".pdf, image/png, image/jpeg, image/jpg" // Specify accepted file types
+                accept=".pdf, image/png, image/jpeg, image/jpg" 
               />
             </div>
             {barMenuFiles.length > 0 && (
@@ -365,7 +342,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
         </div>
       </div>
 
-      {/* Description / All the L */}
       <div>
         <label htmlFor="description" className="block text-gray-700 text-sm font-medium mb-2">
           Description
@@ -380,7 +356,6 @@ const ReceptionHoursStep: React.FC<ReceptionHoursStepProps> = ({ initialData, on
         ></textarea>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between pt-4">
         <button
           type="button"
